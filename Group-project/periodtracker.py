@@ -42,30 +42,53 @@ st.warning(f"**Fertile Window:** {fertile_start.strftime('%B %d, %Y')} - {fertil
 # -------------------------------
 st.subheader("📅 Monthly Calendar Overview")
 
-# Generate current month dates
-year = date.today().year
-month = date.today().month
-days_in_month = calendar.monthrange(year, month)[1]
-calendar_dates = [date(year, month, day) for day in range(1, days_in_month + 1)]
+import calendar
+from datetime import date, timedelta
+import streamlit as st
 
-# Mark period and fertile window
-calendar_df = pd.DataFrame({"Date": calendar_dates})
-calendar_df["Status"] = "Normal"
-calendar_df.loc[(calendar_df["Date"] >= next_period_start) & (calendar_df["Date"] <= next_period_end), "Status"] = "Period"
-calendar_df.loc[(calendar_df["Date"] >= fertile_start) & (calendar_df["Date"] <= fertile_end), "Status"] = "Fertile"
+# Function to build a colored calendar
+def create_period_calendar(last_period, cycle_length=28, period_length=5, fertile_days=6):
+    today = date.today()
+    current_year = today.year
+    current_month = today.month
 
-# Plot heatmap using Plotly
-fig = px.scatter(
-    calendar_df, x="Date", y=[1] * len(calendar_df),
-    color="Status",
-    color_discrete_map={"Period": "red", "Fertile": "green", "Normal": "lightgrey"},
-    symbol="Status",
-    size=[15] * len(calendar_df),
-    labels={"y": ""}
-)
-fig.update_yaxes(showticklabels=False, showgrid=False)
-fig.update_layout(showlegend=True, height=150, margin=dict(l=20, r=20, t=20, b=20))
-st.plotly_chart(fig, use_container_width=True)
+    # Calculate next period start
+    next_period_start = last_period + timedelta(days=cycle_length)
+    period_days = [next_period_start + timedelta(days=i) for i in range(period_length)]
+
+    # Calculate fertile window (5 days before ovulation)
+    ovulation_day = next_period_start - timedelta(days=14)
+    fertile_window = [ovulation_day - timedelta(days=i) for i in range(fertile_days)]
+
+    cal = calendar.Calendar()
+    month_days = cal.monthdayscalendar(current_year, current_month)
+
+    # Calendar header
+    st.subheader(f"🗓 {calendar.month_name[current_month]} {current_year}")
+    st.markdown("| Mon | Tue | Wed | Thu | Fri | Sat | Sun |")
+    st.markdown("|-----|-----|-----|-----|-----|-----|-----|")
+
+    # Render each week
+    for week in month_days:
+        week_str = "| "
+        for day in week:
+            if day == 0:
+                week_str += "   | "
+            else:
+                this_date = date(current_year, current_month, day)
+
+                # Highlight rules
+                if this_date == today:
+                    week_str += f"<span style='background-color:#add8e6; padding:2px; border-radius:4px;'><b>{day}</b></span> | "
+                elif this_date in period_days:
+                    week_str += f"<span style='background-color:#ff9999; padding:2px; border-radius:4px;'><b>{day}</b></span> | "
+                elif this_date in fertile_window:
+                    week_str += f"<span style='background-color:#90ee90; padding:2px; border-radius:4px;'><b>{day}</b></span> | "
+                else:
+                    week_str += f"{day} | "
+
+        st.markdown(week_str, unsafe_allow_html=True)
+        st.markdown("|-----|-----|-----|-----|-----|-----|-----|")
 
 # -------------------------------
 # PERIOD HISTORY (last 3 cycles)
