@@ -1,15 +1,10 @@
-import streamlit as st 
-import pandas as pd
-# Set page title
-st.title("My First Streamlit App")
+import streamlit as st
+import google.generativeai as genai
 
-# Add header
-st.header("Welcome to the dashboard")
-
-# Add text
-st.write("This is a simple demonstration of Streamlit capabilities")
-
-## Creating a Simple Streamlit Chatbot
+# Configure Gemini API
+GOOGLE_API_KEY = "AIzaSyCGKDUCESR0dCzCzFR-xOXPy92jSsXn3Kc"
+genai.configure(api_key=GOOGLE_API_KEY)
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 def initialize_session_state():
     if "messages" not in st.session_state:
