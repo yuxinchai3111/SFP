@@ -1,63 +1,41 @@
-import streamlit as st
-import google.generativeai as genai
+import streamlit as st 
+import pandas as pd
+# Set page title
+st.title("Your Very Own Period Tracker")
 
-# Configure Gemini API
-GOOGLE_API_KEY = "AIzaSyCGKDUCESR0dCzCzFR-xOXPy92jSsXn3Kc"
-genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+# Add header and slogan
+st.header("Period Peace Begins Here! ")
+st.subheader("Do you remember when your last period ended? ")
 
-def initialize_session_state():
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+# Ask user for last period end date
+last_period = st.date_input("When did your last period end? ")
 
-def main():
-    st.title("Simple Chatbot")
-    
-    initialize_session_state()
-
-    # Display chat messages
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
-
-    # Chat input
-    if prompt := st.chat_input("What's on your mind?"):
-        # Display user message
-        with st.chat_message("user"):
-            st.write(prompt)
-        
-        # Add user message to history
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        
-        # Add simple bot response
-        response = f"You said: {prompt}"
-        with st.chat_message("assistant"):
-            st.write(response)
-        
-        st.session_state.messages.append({"role": "assistant", "content": response})
-
-if __name__ == "__main__":
-    main()
-
-# Sample DataFrame
+#Sample DataFrame (replace with your own tracking data)
 df = pd.DataFrame({
-    'Month': ['January', 'February', 'March', 'January'],
-    'Price': [1000, 1500, 2000, 1200]
+    'Month': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    'Average Cycle Length': [28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28],
+    'Last Period End Date': [last_period - pd.DateOffset(days=28*i) for i in range(12)]
 })
 
-# Add sidebar
+# Add sidebar filters
 st.sidebar.header("Filters")
-
-# Add dropdown
 selected_month = st.sidebar.selectbox(
     "Select Month",
     options=df['Month'].unique()
 )
 
-# Add slider
-price_range = st.sidebar.slider(
-    "Select Price Range",
-    min_value=0,
-    max_value=3000,
-    value=(0, 3000)
+periodduration_range = st.sidebar.slider(
+    "Select Period Duration",
+    min_value=1,
+    max_value=14,
+    value=(5)
 )
+#Filter data based on sidebar selections
+filtered_df = df[
+    (df['Month'] == selected_month) &
+    'Period Duration':[5] * 12, 
+]
+
+#Display filtered data
+st.subheader("Your Period Data")
+st.dataframe(filtered_df)
