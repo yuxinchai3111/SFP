@@ -108,6 +108,20 @@ color_functions = [st.success, st.info, st.warning, st.error]
 random_color = random.choice(color_functions)
 random_color(random_tip)
 
+st.header("🚑 When to Seek Help")
+st.markdown("""
+If your period cramps are **too severe** or **do not improve with home remedies**, consider reaching out to a healthcare professional.
+
+**Malaysia Healthcare Hotlines:**
+- **KKM Healthline (MOH):** 03-8883 4400  
+- **Hospital Kuala Lumpur (HKL):** +603-2615 5555  
+- **Pantai Hospital Kuala Lumpur:** +603-2296 0888  
+- **Gleneagles Hospital Kuala Lumpur:** +603-4141 3000  
+
+For emergencies, call **999** or visit the nearest clinic/hospital.
+""")
+
+
 st.header("🎵 Feeling Sad? ")
 st.write("❤️ **Try this song to lift your spirits:** ")
 import random
@@ -142,3 +156,14 @@ allowfullscreen=""
 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
 </iframe>
 """, unsafe_allow_html=True)
+
+st.header("📚 Our Group Members Who Made This Web Application:")
+members = {
+    "Chai Yu Xin",
+    "Hani Yasmin",
+    "Choy Yuee Yann",
+    "Angel Thu"
+}
+st.write("**Members:** ")
+for member in members:
+    st.write(f"- {member}")
