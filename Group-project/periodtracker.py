@@ -88,6 +88,12 @@ def create_beautiful_calendar(last_period, cycle_length=28, period_length=5, fer
                           group_tasks=True, showgrid_x=True, showgrid_y=True)
     return fig
 
+import streamlit as st
+from datetime import date
+
+last_period = st.date_input("When did your last period end?")
+fig = create_beautiful_calendar(last_period)
+st.plotly_chart(fig, use_container_width=True)
 
 
 # -------------------------------
