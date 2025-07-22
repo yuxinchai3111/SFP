@@ -41,102 +41,53 @@ st.warning(f"**Fertile Window:** {fertile_start.strftime('%B %d, %Y')} - {fertil
 # CALENDAR HEATMAP
 # -------------------------------
 st.subheader("📅 Monthly Calendar Overview")
-import calendar
-from datetime import date, timedelta
-import streamlit as st
 
-# Function to build a colored calendar
-def create_period_calendar(last_period, cycle_length=28, period_length=5, fertile_days=6):
-    today = date.today()
+import plotly.figure_factory as ff
+from datetime import datetime, timedelta
+import calendar
+
+def create_beautiful_calendar(last_period, cycle_length=28, period_length=5, fertile_days=6):
+    today = datetime.today().date()
     current_year = today.year
     current_month = today.month
 
-    # Calculate next period start
+    # Calculate important dates
     next_period_start = last_period + timedelta(days=cycle_length)
     period_days = [next_period_start + timedelta(days=i) for i in range(period_length)]
 
-    # Calculate fertile window (5 days before ovulation)
     ovulation_day = next_period_start - timedelta(days=14)
     fertile_window = [ovulation_day - timedelta(days=i) for i in range(fertile_days)]
 
+    # Generate all days for current month
     cal = calendar.Calendar()
-    month_days = cal.monthdayscalendar(current_year, current_month)
+    month_days = [d for week in cal.monthdatescalendar(current_year, current_month) for d in week]
 
-    # Calendar header
-    st.subheader(f"🗓 {calendar.month_name[current_month]} {current_year}")
-    st.markdown("| Mon | Tue | Wed | Thu | Fri | Sat | Sun |")
-    st.markdown("|-----|-----|-----|-----|-----|-----|-----|")
+    # Prepare data for Plotly table
+    data = []
+    for day in month_days:
+        color = 'white'
+        text_color = 'black'
 
-    # Render each week
-    for week in month_days:
-        week_str = "| "
-        for day in week:
-            if day == 0:
-                week_str += "   | "
-            else:
-                this_date = date(current_year, current_month, day)
+        if day == today:
+            color = '#87CEFA'  # Light blue for today
+        if day in period_days:
+            color = '#FF9999'  # Red for period days
+        if day in fertile_window:
+            color = '#90EE90'  # Green for fertile days
 
-                # Highlight rules
-                if this_date == today:
-                    week_str += f"<span style='background-color:#add8e6; padding:2px; border-radius:4px;'><b>{day}</b></span> | "
-                elif this_date in period_days:
-                    week_str += f"<span style='background-color:#ff9999; padding:2px; border-radius:4px;'><b>{day}</b></span> | "
-                elif this_date in fertile_window:
-                    week_str += f"<span style='background-color:#90ee90; padding:2px; border-radius:4px;'><b>{day}</b></span> | "
-                else:
-                    week_str += f"{day} | "
+        data.append({
+            'Task': ' ',
+            'Start': day,
+            'Finish': day + timedelta(days=1),
+            'Resource': color
+        })
 
-        st.markdown(week_str, unsafe_allow_html=True)
-import calendar
-from datetime import date, timedelta
-import streamlit as st
+    # Create Gantt-like calendar
+    fig = ff.create_gantt(data, index_col='Resource', show_colorbar=False,
+                          title=f"{calendar.month_name[current_month]} {current_year}",
+                          group_tasks=True, showgrid_x=True, showgrid_y=True)
+    return fig
 
-# Function to build a colored calendar
-def create_period_calendar(last_period, cycle_length=28, period_length=5, fertile_days=6):
-    today = date.today()
-    current_year = today.year
-    current_month = today.month
-
-    # Calculate next period start
-    next_period_start = last_period + timedelta(days=cycle_length)
-    period_days = [next_period_start + timedelta(days=i) for i in range(period_length)]
-
-    # Calculate fertile window (5 days before ovulation)
-    ovulation_day = next_period_start - timedelta(days=14)
-    fertile_window = [ovulation_day - timedelta(days=i) for i in range(fertile_days)]
-
-    cal = calendar.Calendar()
-    month_days = cal.monthdayscalendar(current_year, current_month)
-
-    # Calendar header
-    st.subheader(f"🗓 {calendar.month_name[current_month]} {current_year}")
-    st.markdown("| Mon | Tue | Wed | Thu | Fri | Sat | Sun |")
-    st.markdown("|-----|-----|-----|-----|-----|-----|-----|")
-
-    # Render each week
-    for week in month_days:
-        week_str = "| "
-        for day in week:
-            if day == 0:
-                week_str += "   | "
-            else:
-                this_date = date(current_year, current_month, day)
-
-                # Highlight rules
-                if this_date == today:
-                    week_str += f"<span style='background-color:#add8e6; padding:2px; border-radius:4px;'><b>{day}</b></span> | "
-                elif this_date in period_days:
-                    week_str += f"<span style='background-color:#ff9999; padding:2px; border-radius:4px;'><b>{day}</b></span> | "
-                elif this_date in fertile_window:
-                    week_str += f"<span style='background-color:#90ee90; padding:2px; border-radius:4px;'><b>{day}</b></span> | "
-                else:
-                    week_str += f"{day} | "
-
-        st.markdown(week_str, unsafe_allow_html=True)
-
-# Example usage (inside your main app)
-last_period = st.date_input("When did your last period end?")
-create_period_calendar(last_period)
 
 
 # -------------------------------
