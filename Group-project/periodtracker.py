@@ -94,7 +94,9 @@ from datetime import date
 last_period = st.date_input("When did your last period end?")
 fig = create_beautiful_calendar(last_period)
 st.plotly_chart(fig, use_container_width=True)
-
+st.write("Light blue indicates TODAY.")
+st.write("Red indicates your period days.")
+st.write("Green indicates your fertile days.")
 
 # -------------------------------
 # PERIOD HISTORY (last 3 cycles)
