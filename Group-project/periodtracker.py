@@ -94,11 +94,11 @@ from datetime import date
 last_period = st.date_input("When did your last period end?")
 fig = create_beautiful_calendar(last_period)
 st.plotly_chart(fig, use_container_width=False)
-fig.update_layout(
+    fig.update_layout(
     width=800,
     height=400
     )
-return fig
+    return fig
 st.write("Light blue indicates TODAY.")
 st.write("Red indicates your PERIOD DAYS.")
 st.write("Green indicates your FERTILE DAYS.")
