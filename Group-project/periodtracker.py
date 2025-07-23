@@ -194,7 +194,6 @@ members = {
     "Hani Yasmin",
     "Choy Yuee Yann",
     "Angel Thu"
-    "Kee Xin Yu"
 }
 st.write("**Members:** ")
 for member in members:
